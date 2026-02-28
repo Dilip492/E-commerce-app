@@ -13,12 +13,15 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import "../../global.css";
+import { useProducts } from "../../hooks/UseProducts";
 import { colors } from "../../theme/colors";
 
 export default function Index() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [activeBrand, setActiveBrand] = useState("puma");
 
+  const { product, loading } = useProducts();
+  // console.log(product)
 
   const router = useRouter();
 
@@ -150,8 +153,8 @@ export default function Index() {
           ))}
         </View> */}
 
- 
-         
+
+
         <View className="mt-8 px-4">
           <View className="flex-row justify-between items-center mb-4 px-2">
             <Text className="text-xl font-bold" style={{ color: colors.heading }}>Popular Brands</Text>
@@ -195,13 +198,13 @@ export default function Index() {
 
         {/* Product Grid */}
         <View className="flex-row flex-wrap justify-between px-4 mt-4">
-          {products.map((item) => (
-            <TouchableOpacity key={item.id} className="w-[48%] mb-5" onPress={() => handleProductPress(item)}
+          {product.map((item) => (
+            <TouchableOpacity key={item._id} className="w-[48%] mb-5" onPress={() => handleProductPress(item)}
               activeOpacity={0.7}>
               {/* Product Image with Heart Icon */}
               <View className="relative">
                 <Image
-                  source={item.image}
+                  source={{ uri: item.images[0]}}
                   className="w-full h-64 rounded-xl"
                   resizeMode="cover"
                 />

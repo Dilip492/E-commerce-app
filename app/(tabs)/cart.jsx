@@ -199,7 +199,7 @@ export default function CartPage() {
 
             {/* <Text className="text-base font-bold tracking-tight text-black">Product Details</Text> */}
             <Text
-              className="text-xl font-bold flex"
+              className="text-xl tracking-tight font-bold flex"
               style={{ color: colors.heading }}
             >
               Shopping Cart

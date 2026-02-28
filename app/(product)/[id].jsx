@@ -48,7 +48,7 @@ export default function ProductDetails() {
             <Ionicons name="chevron-back" size={24} color="#000" />
           </TouchableOpacity>
           
-          <Text className="text-base font-bold tracking-tight text-black">Product Details</Text>
+          <Text className="text-xl font-bold tracking-tight text-black">Product Details</Text>
           
           <TouchableOpacity onPress={()=>{ router.replace('/(tabs)/cart')}} className="h-10 w-10 items-center justify-center rounded-full relative">
             <Ionicons name="bag-outline" size={24} color="#000" />

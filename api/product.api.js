@@ -1,3 +1,5 @@
 import api from "./client"
 
-export const  product = 
+export const productFetch = () =>{
+   return api.get("/api/admin/Products")
+} 
