@@ -61,10 +61,10 @@ export default function OTPVerification() {
       if (response.status === 200) {
 
         Alert.alert('Success', 'Account verified successfully!');
-        await SecureStore.setItemAsync(
-          "accessToken",
-          response.data.token
-        );
+        // await SecureStore.setItemAsync(
+        //   "accessToken",
+        //   response.data.token
+        // );  
 
 
         console.log("Server response:", response.data);

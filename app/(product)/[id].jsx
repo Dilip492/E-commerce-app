@@ -3,13 +3,13 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Image,
-  SafeAreaView,
   ScrollView,
   StatusBar,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProductDetails() {
   const router = useRouter();
@@ -35,11 +35,11 @@ export default function ProductDetails() {
   const decreaseQuantity = () => setQuantity(prev => (prev > 1 ? prev - 1 : 1));
 
   return (
-    <View className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white">
       <StatusBar barStyle="dark-content" backgroundColor="white" />
       
       {/* Top Navigation Bar */}
-      <SafeAreaView className="bg-white">
+      <View className="bg-white">
         <View className="flex-row items-center justify-between px-4 py-3 border-b border-gray-200">
           <TouchableOpacity 
             onPress={() => router.back()}
@@ -57,7 +57,7 @@ export default function ProductDetails() {
             </View>
           </TouchableOpacity>
         </View>
-      </SafeAreaView>
+      </View>
 
       <ScrollView 
         showsVerticalScrollIndicator={false}
@@ -301,6 +301,6 @@ export default function ProductDetails() {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
