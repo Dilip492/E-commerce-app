@@ -71,17 +71,17 @@ export default function Index() {
   ];
 
   // Navigate to product detail
-  const handleProductPress = (product) => {
-    router.push({
-      pathname: `/(product)/₹{product.id}`,
-      params: {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        // You can pass more params if needed
-      }
-    });
-  };
+    const handleProductPress = (product) => {
+      router.push({
+        pathname: `/(product)/${product._id}`,
+        params: {
+          id: product._id,
+          name: product.name,
+          price: product.price,
+          // You can pass more params if needed
+        }
+      });
+    };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -229,7 +229,7 @@ export default function Index() {
                   {item.name}
                 </Text>
                 <Text className="font-semibold text-gray-900 mt-0.5">
-                  {item.price}
+                  ₹ {item.price}
                 </Text>
               </View>
             </TouchableOpacity>
