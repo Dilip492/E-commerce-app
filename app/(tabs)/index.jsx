@@ -1,8 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  Image,
+  // Image,
   Pressable,
   ScrollView,
   StatusBar,
@@ -22,6 +23,15 @@ export default function Index() {
 
   const { product, loading } = useProducts();
   // console.log(product)
+  useEffect(() => {
+    if (product && product.length > 0) {
+      product.forEach((item) => {
+        if (item.images && item.images.length > 0) {
+          Image.prefetch(item.images[0]);
+        }
+      });
+    }
+  }, [product]);
 
   const router = useRouter();
 
@@ -71,17 +81,17 @@ export default function Index() {
   ];
 
   // Navigate to product detail
-    const handleProductPress = (product) => {
-      router.push({
-        pathname: `/(product)/${product._id}`,
-        params: {
-          id: product._id,
-          name: product.name,
-          price: product.price,
-          // You can pass more params if needed
-        }
-      });
-    };
+  const handleProductPress = (product) => {
+    router.push({
+      pathname: `/(product)/${product._id}`,
+      params: {
+        id: product._id,
+        name: product.name,
+        price: product.price,
+        // You can pass more params if needed
+      }
+    });
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -113,8 +123,10 @@ export default function Index() {
         <View className="mx-5 mt-2 rounded-2xl overflow-hidden relative">
           <Image
             source={require("../../assets/images/banner-1.webp")}
-            className="w-full h-44"
-            resizeMode="cover"
+            style={{ width: "100%", height: 180 }}
+            contentFit="cover"
+            transition={300}
+            cachePolicy="memory-disk"
           />
           {/* <View className="absolute left-5 top-8">
             <Text className="text-white text-xs tracking-widest font-medium">
@@ -204,9 +216,11 @@ export default function Index() {
               {/* Product Image with Heart Icon */}
               <View className="relative">
                 <Image
-                  source={{ uri: item.images[0]}}
-                  className="w-full h-64 rounded-xl"
-                  resizeMode="cover"
+                  source={item.images?.length ? item.images[0] : require("../../assets/images/product.jpg")}
+                  style={{ width: "100%", height: 256, borderRadius: 12 }}
+                  contentFit="cover"
+                  transition={300}
+                  cachePolicy="memory-disk"
                 />
                 {/* Heart Button - THIS WORKS! */}
                 <TouchableOpacity
@@ -242,3 +256,45 @@ export default function Index() {
     </SafeAreaView>
   );
 }
+
+const renderProduct = ({ item }) => (
+  <TouchableOpacity
+    key={item._id}
+    className="w-[48%] mb-5"
+    onPress={() => handleProductPress(item)}
+    activeOpacity={0.7}
+  >
+    <View className="relative">
+      <Image
+        source={
+          item.images?.length
+            ? { uri: item.images[0] }
+            : require("../../assets/images/product.jpg")
+        }
+        className="w-full h-64 rounded-xl"
+        resizeMode="cover"
+      />
+
+      <TouchableOpacity
+        onPress={() => toggleFavorite(item._id)}
+        className="absolute right-2 top-2 bg-white p-2 rounded-full shadow-sm"
+        style={{ elevation: 2 }}
+      >
+        <Ionicons
+          name={favorites[item._id] ? "heart" : "heart-outline"}
+          size={16}
+          color={favorites[item._id] ? "#ff4444" : "#333"}
+        />
+      </TouchableOpacity>
+    </View>
+
+    <View className="mt-2 px-3">
+      <Text className="text-sm text-gray-600" numberOfLines={1}>
+        {item.name}
+      </Text>
+      <Text className="font-semibold text-gray-900 mt-0.5">
+        ₹ {item.price}
+      </Text>
+    </View>
+  </TouchableOpacity>
+);

@@ -27,7 +27,7 @@ export default function ProductDetails() {
 
   const { product, loading } = useProduct(id);
 
-  console.log("product detail", product);
+  // console.log("product detail", product);
 
 
   const colors = [
