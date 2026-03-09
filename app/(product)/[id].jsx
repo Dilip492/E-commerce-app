@@ -1,9 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Dimensions, FlatList,
-  Image,
+  // Image,
   ScrollView,
   StatusBar,
   Text,
@@ -90,7 +91,11 @@ export default function ProductDetails() {
               <Image
                 source={{ uri: item }}
                 style={{ width: width, height: "100%" }}
-                resizeMode="cover"
+                // resizeMode="cover"
+                contentFit="cover"
+                transition={300}
+                cachePolicy="memory-disk"
+
               />
             )}
           />

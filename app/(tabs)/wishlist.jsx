@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import UseWishlist from "../../hooks/UseWishlist";
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 48 - 16) / 2; // 48px padding (24px each side), 16px gap
@@ -19,6 +20,8 @@ export default function Wishlist() {
   const router = useRouter();
 
   // Wishlist items state
+
+  const { getwishlist } = UseWishlist();
   const [wishlistItems, setWishlistItems] = useState([
     {
       id: 1,
@@ -70,21 +73,21 @@ export default function Wishlist() {
   return (
     <View className="flex-1 bg-white">
       <StatusBar barStyle="dark-content" backgroundColor="white" />
-      
+
       {/* Header */}
       <SafeAreaView className="bg-white">
         <View className="flex-row items-center justify-between px-5 py-4">
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => router.back()}
             className="w-10 h-10 items-center justify-center rounded-full"
           >
             <Ionicons name="chevron-back" size={22} color="#333" />
           </TouchableOpacity>
-          
+
           <Text className="text-xl font-medium tracking-tight text-gray-900">
             Wishlist
           </Text>
-          
+
           <TouchableOpacity className="w-10 h-10 items-center justify-center rounded-full">
             <Ionicons name="share-outline" size={22} color="#333" />
           </TouchableOpacity>
@@ -99,7 +102,7 @@ export default function Wishlist() {
       </View>
 
       {/* Wishlist Grid */}
-      <ScrollView 
+      <ScrollView
         showsVerticalScrollIndicator={false}
         className="flex-1 px-6"
         contentContainerStyle={{ paddingBottom: 20 }}
@@ -115,9 +118,9 @@ export default function Wishlist() {
                     className="w-full h-full"
                     resizeMode="cover"
                   />
-                  
+
                   {/* Remove Button */}
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     onPress={() => removeItem(item.id)}
                     className="absolute top-2 right-2 w-8 h-8 items-center justify-center rounded-full bg-white/90"
                   >
@@ -141,7 +144,7 @@ export default function Wishlist() {
 
         {/* Add All to Cart Button */}
         <View className="mt-8 mb-4">
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={addAllToCart}
             className="w-full flex-row items-center justify-center gap-2 h-14 bg-black rounded-lg"
             activeOpacity={0.8}

@@ -15,6 +15,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import "../../global.css";
 import { useProducts } from "../../hooks/UseProducts";
+import UseWishlist from "../../hooks/UseWishlist";
 import { colors } from "../../theme/colors";
 
 export default function Index() {
@@ -22,6 +23,9 @@ export default function Index() {
   const [activeBrand, setActiveBrand] = useState("puma");
 
   const { product, loading } = useProducts();
+
+  const { wishlist, setWishlist, addtowishlist, removeFromWishlist } = UseWishlist();
+  console.log("wishlist", wishlist)
   // console.log(product)
   useEffect(() => {
     if (product && product.length > 0) {
@@ -37,12 +41,31 @@ export default function Index() {
 
   const [favorites, setFavorites] = useState({});
 
-  const toggleFavorite = (productId) => {
-    setFavorites(prev => ({
-      ...prev,
-      [productId]: !prev[productId]
-    }));
+  const toggleFavorite = async (productId) => {
+    try {
+
+      const list = Array.isArray(wishlist) ? wishlist : [];
+
+      if (list.includes(productId)) {
+
+        await removeFromWishlist(productId);
+
+        setWishlist(prev => prev.filter(id => id !== productId));
+
+      } else {
+
+        await addtowishlist(productId);
+
+        setWishlist(prev => [...prev, productId]);
+
+      }
+
+    } catch (error) {
+      console.log("Wishlist Error:", error);
+    }
   };
+
+
   const categories = ["All", "Apparel", "Accessories"];
 
   const brands = [
@@ -94,7 +117,8 @@ export default function Index() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    // className="flex-1 bg-white"
+    <SafeAreaView style={{ flex: 1 }}>
       <StatusBar barStyle="dark-content" backgroundColor="white" />
       <ScrollView showsVerticalScrollIndicator={false}>
 
@@ -272,7 +296,8 @@ const renderProduct = ({ item }) => (
             : require("../../assets/images/product.jpg")
         }
         className="w-full h-64 rounded-xl"
-        resizeMode="cover"
+        // resizeMode="cover"
+        contentFit="cover"
       />
 
       <TouchableOpacity
