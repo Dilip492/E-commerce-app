@@ -1,16 +1,18 @@
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useState } from "react";
 import {
   Dimensions,
-  Image,
-  SafeAreaView,
+  // Image,
+  // SafeAreaView,
   ScrollView,
   StatusBar,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+// import UseWishlist from "../../hooks/UseWishlist";
 import UseWishlist from "../../hooks/UseWishlist";
 
 const { width } = Dimensions.get('window');
@@ -19,55 +21,58 @@ const CARD_WIDTH = (width - 48 - 16) / 2; // 48px padding (24px each side), 16px
 export default function Wishlist() {
   const router = useRouter();
 
-  // Wishlist items state
+  // Wishlist items state 
 
-  const { getwishlist } = UseWishlist();
-  const [wishlistItems, setWishlistItems] = useState([
-    {
-      id: 1,
-      name: "Silk Slip Dress",
-      price: 240.00,
-      image: require("../../assets/images/product.jpg"),
-    },
-    {
-      id: 2,
-      name: "Cashmere Knit",
-      price: 315.00,
-      image: require("../../assets/images/product.jpg"),
-    },
-    {
-      id: 3,
-      name: "Leather Tote",
-      price: 580.00,
-      image: require("../../assets/images/product.jpg"),
-    },
-    {
-      id: 4,
-      name: "Gold Hoops",
-      price: 110.00,
-      image: require("../../assets/images/product.jpg"),
-    },
-    {
-      id: 5,
-      name: "Velvet Flats",
-      price: 185.00,
-      image: require("../../assets/images/product.jpg"),
-    },
-    {
-      id: 6,
-      name: "Wool Trousers",
-      price: 295.00,
-      image: require("../../assets/images/product.jpg"),
-    },
-  ]);
+
+  const { wishlist, removeFromWishlist } = UseWishlist();
+
+  // console.log("whishlist page ", wishlist);
+  // const [wishlistItems, setWishlistItems] = useState([
+  //   {
+  //     id: 1,
+  //     name: "Silk Slip Dress",
+  //     price: 240.00,
+  //     image: require("../../assets/images/product.jpg"),
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Cashmere Knit",
+  //     price: 315.00,
+  //     image: require("../../assets/images/product.jpg"),
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Leather Tote",
+  //     price: 580.00,
+  //     image: require("../../assets/images/product.jpg"),
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "Gold Hoops",
+  //     price: 110.00,
+  //     image: require("../../assets/images/product.jpg"),
+  //   },
+  //   {
+  //     id: 5,
+  //     name: "Velvet Flats",
+  //     price: 185.00,
+  //     image: require("../../assets/images/product.jpg"),
+  //   },
+  //   {
+  //     id: 6,
+  //     name: "Wool Trousers",
+  //     price: 295.00,
+  //     image: require("../../assets/images/product.jpg"),
+  //   },
+  // ]);
 
   const removeItem = (id) => {
-    setWishlistItems(prev => prev.filter(item => item.id !== id));
+    // setWishlistItems(prev => prev.filter(item => item.id !== id));
   };
 
   const addAllToCart = () => {
     // Handle adding all items to cart
-    console.log("Adding all to cart:", wishlistItems);
+    // console.log("Adding all to cart:", wishlistItems);
   };
 
   return (
@@ -97,7 +102,7 @@ export default function Wishlist() {
       {/* Product Count */}
       <View className="px-6 pt-2 pb-4">
         <Text className="text-xs uppercase tracking-[0.2em] text-gray-400 font-medium">
-          {wishlistItems.length} Saved Items
+          {wishlist.length} Saved Items
         </Text>
       </View>
 
@@ -108,20 +113,23 @@ export default function Wishlist() {
         contentContainerStyle={{ paddingBottom: 20 }}
       >
         <View className="flex-row flex-wrap justify-between">
-          {wishlistItems.map((item) => (
-            <View key={item.id} style={{ width: CARD_WIDTH, marginBottom: 32 }}>
+          {wishlist.map((item) => (
+            <View key={item._id} style={{ width: CARD_WIDTH, marginBottom: 32 }}>
               <View className="flex-col">
                 {/* Product Image */}
                 <View className="relative aspect-[3/4] overflow-hidden rounded-lg bg-gray-100">
                   <Image
-                    source={item.image}
-                    className="w-full h-full"
-                    resizeMode="cover"
+                    source={item.images[0]}
+                    style={{ width: "100%", height: 256, borderRadius: 12 }}
+                    contentFit="cover"
+                    transition={300}
+                    cachePolicy="memory-disk"
                   />
 
                   {/* Remove Button */}
                   <TouchableOpacity
-                    onPress={() => removeItem(item.id)}
+                    // onPress={() => removeItem(item.id)}
+                    onPress={() => removeFromWishlist(item._id)}
                     className="absolute top-2 right-2 w-8 h-8 items-center justify-center rounded-full bg-white/90"
                   >
                     <Ionicons name="close" size={16} color="#333" />

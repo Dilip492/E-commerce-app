@@ -1,53 +1,76 @@
-import { useEffect, useState } from "react";
-import { addTowishlist, removewishlist, wishlistfetch } from '../api/wishlist';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { addTowishlist, getwishlist, removewishlist } from "../api/wishlist";
 
-export default function UseWishlist() {
-    const [wishlist, setWishlist] = useState([]);
-    const [loading, setLoading] = useState();
+export default function useWishlist() {
+  const queryClient = useQueryClient();
 
-    const getwishlist = async () => {
-        try {
-            const res = await wishlistfetch();
-            setWishlist(res.data);
-        } catch (error) {
-            console.log(error);
-        } finally {
-            setLoading(false);
-        }
-    }
+  // ✅ GET wishlist
+  const { data, isLoading, error } = useQuery({
 
-    const addtowishlist = async (productId) => {
-        try {
-            const res = await addTowishlist(productId);
-            setWishlist((prev) => [...prev, res.data]);
-        } catch (error) {
-            console.log("error from ", error);
-        }
-    }
+    queryKey: ["wishlist"],
+    queryFn: async () => {
+      const res = await getwishlist();
+      return res?.data || [];
+    },
+  });
 
-    // DELETE remove from wishlist
-    const removeFromWishlist = async (id) => {
-        try {
-            await removewishlist(id);
-            setWishlist((prev) => prev.filter((item) => item._id !== id));
-        } catch (error) {
-            console.log(error);
-        }
-    };
+  // ✅ ADD to wishlist
+  const addMutation = useMutation({
+    mutationFn: (productId) => addTowishlist(productId),
 
-    useEffect(() => {
-        getwishlist();
-    }, []);
+    // 🔥 Optimistic update (instant UI update)
+    onMutate: async (productId) => {
+      await queryClient.cancelQueries(["wishlist"]);
 
-    return {
-        wishlist,
-        setWishlist,
-        loading,
-        getwishlist,
-        addtowishlist,
-        removeFromWishlist,
-    };
+      const previousWishlist = queryClient.getQueryData(["wishlist"]);
 
+      queryClient.setQueryData(["wishlist"], (old = []) => [
+        ...old,
+        { _id: productId }, // keep structure consistent
+      ]);
 
+      return { previousWishlist };
+    },
+
+    onError: (err, productId, context) => {
+      queryClient.setQueryData(["wishlist"], context.previousWishlist);
+    },
+
+    onSettled: () => {
+      queryClient.invalidateQueries(["wishlist"]);
+    },
+  });
+
+  // ✅ REMOVE from wishlist
+  const removeMutation = useMutation({
+    mutationFn: (id) => removewishlist(id),
+
+    onMutate: async (id) => {
+      await queryClient.cancelQueries(["wishlist"]);
+
+      const previousWishlist = queryClient.getQueryData(["wishlist"]);
+
+      queryClient.setQueryData(["wishlist"], (old = []) =>
+        old.filter((item) => item._id !== id)
+      );
+
+      return { previousWishlist };
+    },
+
+    onError: (err, id, context) => {
+      queryClient.setQueryData(["wishlist"], context.previousWishlist);
+    },
+
+    onSettled: () => {
+      queryClient.invalidateQueries(["wishlist"]);
+    },
+  });
+
+  return {
+    wishlist: data || [],
+    loading: isLoading,
+    error,
+    addtowishlist: addMutation.mutate,
+    removeFromWishlist: removeMutation.mutate,
+  };
 }
-

@@ -15,7 +15,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import "../../global.css";
 import { useProducts } from "../../hooks/UseProducts";
-import UseWishlist from "../../hooks/UseWishlist";
+// import UseWishlist from "../../hooks/UseWishlist";
+import useWishlist from "../../hooks/UseWishlist";
 import { colors } from "../../theme/colors";
 
 export default function Index() {
@@ -24,8 +25,10 @@ export default function Index() {
 
   const { product, loading } = useProducts();
 
-  const { wishlist, setWishlist, addtowishlist, removeFromWishlist } = UseWishlist();
-  console.log("wishlist", wishlist)
+  // const { wishlist, setWishlist, addtowishlist, removeFromWishlist } = UseWishlist();
+  const { wishlist, addtowishlist, removeFromWishlist } = useWishlist();
+
+  console.log("wishlist fetch", wishlist.length)
   // console.log(product)
   useEffect(() => {
     if (product && product.length > 0) {
@@ -41,29 +44,34 @@ export default function Index() {
 
   const [favorites, setFavorites] = useState({});
 
-  const toggleFavorite = async (productId) => {
-    try {
 
-      const list = Array.isArray(wishlist) ? wishlist : [];
+  const isInWishlist = (id) => {
+    wishlist.some((item) => item._id === id);
+  }
 
-      if (list.includes(productId)) {
+  // const toggleFavorite = async (productId) => {
+  //   try {
 
-        await removeFromWishlist(productId);
+  //     const list = Array.isArray(wishlist) ? wishlist : [];
 
-        setWishlist(prev => prev.filter(id => id !== productId));
+  //     if (list.includes(productId)) {
 
-      } else {
+  //       await removeFromWishlist(productId);
 
-        await addtowishlist(productId);
+  //       setWishlist(prev => prev.filter(_id => _id !== productId));
 
-        setWishlist(prev => [...prev, productId]);
+  //     } else {
 
-      }
+  //       await addtowishlist(productId);
 
-    } catch (error) {
-      console.log("Wishlist Error:", error);
-    }
-  };
+  //       setWishlist(prev => [...prev, productId]);
+
+  //     }
+
+  //   } catch (error) {
+  //     console.log("Wishlist Error:", error);
+  //   }
+  // };
 
 
   const categories = ["All", "Apparel", "Accessories"];
@@ -248,14 +256,15 @@ export default function Index() {
                 />
                 {/* Heart Button - THIS WORKS! */}
                 <TouchableOpacity
-                  onPress={() => toggleFavorite(item.id)}
+                  // onPress={() => toggleFavorite(item.id)}
+                  onPress={() => isInWishlist(item._id) ? removeFromWishlist(item._id) : addtowishlist(item._id)}
                   className="absolute right-2 top-2 bg-white p-2 rounded-full shadow-sm"
                   style={{ elevation: 2 }} // Small shadow for Android
                 >
                   <Ionicons
-                    name={favorites[item.id] ? "heart" : "heart-outline"}
+                    name={isInWishlist[item._id] ? "heart" : "heart-outline"}
                     size={16}
-                    color={favorites[item.id] ? "#ff4444" : "#333"}
+                    color={isInWishlist[item._id] ? "#ff4444" : "#333"}
                   />
                 </TouchableOpacity>
 
