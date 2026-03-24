@@ -2,7 +2,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import {
-    Image,
     ScrollView,
     StatusBar,
     Text,
@@ -10,14 +9,20 @@ import {
     View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Useuser from "../../hooks/Useuser";
 // import * as SecureStore from "expo-secure-store";
 
 export default function ProfileScreen() {
     const router = useRouter();
 
+    // const [name, setName] = useState(null)
+
+    const { User } = Useuser();
+    console.log("user info", User)
+
     const menuItems = [
-        { id: "personal", icon: "person-outline", label: "Personal Information", route: "/profile/personal" },
-        { id: "orders", icon: "bag-outline", label: "My Orders", route: "/profile/orders" },
+        { id: "personal", icon: "person-outline", label: "Personal Information", route: "/personal" },
+        { id: "orders", icon: "bag-outline", label: "My Orders", route: "/orders" },
         { id: "shipping", icon: "cube-outline", label: "Shipping Addresses", route: "/address" },
         { id: "payment", icon: "card-outline", label: "Payment Methods", route: "/profile/payment" },
         { id: "notifications", icon: "notifications-outline", label: "Notifications", route: "/profile/notifications" },
@@ -65,19 +70,31 @@ export default function ProfileScreen() {
                 <View className="items-center px-6 py-6">
                     <View className="relative mb-4">
                         <View className="w-28 h-28 rounded-full border-4 border-gray-50 overflow-hidden bg-gray-100">
-                            <Image
+                            {/* <Image
                                 source={{ uri: "https://lh3.googleusercontent.com/aida-public/AB6AXuCpjXd1fN15xdirdjOUyifT-DqeuB2odhi3qw2q_wuGQv1wSMvxhH9odvF5eQ3rLiAZEIb2IY3FvhsjwgEeYaaGyoteETUXhztCFDby-DuzTowVV5W1PSnzIoR9043fXvrzxf3gookr9XYAZmZHjpIEkuRJEZqJpmI2r7a-ZcpoqOh3BmBeAWoLzqcasoASxF6ZO7Ms26uMJ6up8eFO1XXaSOOSzsicVjh_CA6VgmXG4KbnuR6adfb-8C8RCRc986xelfynKL7oudI" }}
                                 className="w-full h-full"
                                 resizeMode="cover"
-                            />
+                            /> */}
+                            <View
+                                style={{
+                                    width: 100,
+                                    height: 100,
+                                    borderRadius: 55,
+                                    backgroundColor: "#f1f3f9",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                }}
+                            >
+                                <Ionicons name="person" size={50} color="#000" />
+                            </View>
                         </View>
                         <TouchableOpacity className="absolute bottom-0 right-0 bg-blue-600 p-2 rounded-full shadow-lg border-2 border-white">
-                            <Ionicons name="pencil" size={14} color="#fff" />
+                            {/* <Ionicons name="pencil" size={14} color="#fff" /> */}
                         </TouchableOpacity>
                     </View>
 
                     <Text className="font-serif text-3xl font-bold text-center tracking-tight text-gray-900">
-                        Julianne Smith
+                        {User ? User.user.name : "Guest user"}
                     </Text>
                     <Text className="text-gray-500 text-sm mt-1 font-medium">
                         Premium Member since 2023

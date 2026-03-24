@@ -46,9 +46,8 @@ export default function Index() {
 
 
   const isInWishlist = (id) => {
-    wishlist.some((item) => item._id === id);
-  }
-
+    return wishlist.some((item) => item._id === id);
+  };
   // const toggleFavorite = async (productId) => {
   //   try {
 
@@ -262,9 +261,9 @@ export default function Index() {
                   style={{ elevation: 2 }} // Small shadow for Android
                 >
                   <Ionicons
-                    name={isInWishlist[item._id] ? "heart" : "heart-outline"}
+                    name={isInWishlist(item._id) ? "heart" : "heart-outline"}
                     size={16}
-                    color={isInWishlist[item._id] ? "#ff4444" : "#333"}
+                    color={isInWishlist(item._id) ? "#ff4444" : "#333"}
                   />
                 </TouchableOpacity>
 

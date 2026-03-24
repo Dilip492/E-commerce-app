@@ -16,7 +16,11 @@ export default function useWishlist() {
 
   // ✅ ADD to wishlist
   const addMutation = useMutation({
-    mutationFn: (productId) => addTowishlist(productId),
+    mutationFn: async (productId) => {
+      const res = await addTowishlist(productId);
+      // console.log("API Response:", res);
+      return res;
+    },
 
     // 🔥 Optimistic update (instant UI update)
     onMutate: async (productId) => {
@@ -26,7 +30,7 @@ export default function useWishlist() {
 
       queryClient.setQueryData(["wishlist"], (old = []) => [
         ...old,
-        { _id: productId }, // keep structure consistent
+        productId, // just store id if backend stores only id
       ]);
 
       return { previousWishlist };
@@ -51,12 +55,13 @@ export default function useWishlist() {
       const previousWishlist = queryClient.getQueryData(["wishlist"]);
 
       queryClient.setQueryData(["wishlist"], (old = []) =>
-        old.filter((item) => item._id !== id)
+        old.filter((item) =>
+          (item._id || item) !== id // ✅ handles object + string
+        )
       );
 
       return { previousWishlist };
     },
-
     onError: (err, id, context) => {
       queryClient.setQueryData(["wishlist"], context.previousWishlist);
     },

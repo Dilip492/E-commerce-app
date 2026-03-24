@@ -15,8 +15,8 @@ const api = axios.create({
 api.interceptors.request.use(
     async (config) => {
         const token = await SecureStore.getItemAsync("accessToken")
-        console.log("➡️ REQUEST:", config.method?.toUpperCase(), config.url);
-        console.log("Headers:", config.headers);
+        // console.log("➡️ REQUEST:", config.method?.toUpperCase(), config.url);
+        // console.log("Headers:", config.headers);
         console.log("Body:", config.data);
 
         if (token) {
