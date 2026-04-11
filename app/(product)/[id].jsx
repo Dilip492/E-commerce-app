@@ -12,7 +12,9 @@ import {
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useAddCart, useCart } from "../../hooks/UseCart";
 import { useProduct } from "../../hooks/UseProduct";
+
 const { width } = Dimensions.get("window");
 
 export default function ProductDetails() {
@@ -27,6 +29,13 @@ export default function ProductDetails() {
   const [shippingExpanded, setShippingExpanded] = useState(false);
 
   const { product, loading } = useProduct(id);
+
+  // cart functionality 
+
+  // const {mutate:addTocart } = useCart
+  const { data } = useCart();
+  const cartItems = data?.items || [];
+  const { mutate: addTocart } = useAddCart();
 
   // console.log("product detail", product);
 
@@ -63,7 +72,7 @@ export default function ProductDetails() {
           <TouchableOpacity onPress={() => { router.replace('/(tabs)/cart') }} className="h-10 w-10 items-center justify-center rounded-full relative">
             <Ionicons name="bag-outline" size={24} color="#000" />
             <View className="absolute top-1 right-1 h-4 w-4 items-center justify-center rounded-full bg-black">
-              <Text className="text-[10px] font-bold text-white">2</Text>
+              <Text className="text-[10px] font-bold text-white">{cartItems.length}</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -318,7 +327,23 @@ export default function ProductDetails() {
 
           {/* Add to Cart Button */}
           <TouchableOpacity
-            onPress={() => { router.push('/(tabs)/cart') }}
+            // onPress={() => { router.push('/(tabs)/cart') }}
+            // onPress={()=> {
+            //   console.log("sending", id , quantity);
+            //   addTocart({
+            //   "productId":id,
+            //   quantity:1
+            // })}}
+            onPress={() => {
+              const productId = Array.isArray(id) ? id[0] : id;
+
+              console.log("SENDING:", productId, quantity);
+
+              addTocart({
+                productId,
+                quantity: Number(quantity)
+              });
+            }}
             className="flex-1 h-14 items-center justify-center rounded-xl bg-black"
             activeOpacity={0.8}
           >

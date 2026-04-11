@@ -10,11 +10,16 @@ import {
     View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useAddress } from "../hooks/UseAddress";
 
 export default function CheckoutShipping() {
     const router = useRouter();
     const [selectedAddress, setSelectedAddress] = useState("home");
     const [deliveryInstructions, setDeliveryInstructions] = useState("");
+
+    const { data } = useAddress();
+
+    console.log(data);
 
     const addresses = [
         {
@@ -36,13 +41,13 @@ export default function CheckoutShipping() {
     ];
 
     const handleBack = () => {
-    if (router.canGoBack()) {
-        router.back();
-    } else {
-        // Navigate to a safe default screen
-        router.replace('/(tabs)'); // or your home screen
-    }
-};
+        if (router.canGoBack()) {
+            router.back();
+        } else {
+            // Navigate to a safe default screen
+            router.replace('/(tabs)'); // or your home screen
+        }
+    };
 
     return (
         <View className="flex-1 bg-white">
@@ -64,7 +69,7 @@ export default function CheckoutShipping() {
                 </View>
             </SafeAreaView>
 
-            <ScrollView 
+            <ScrollView
                 showsVerticalScrollIndicator={false}
                 className="flex-1"
                 contentContainerStyle={{ paddingBottom: 130 }}
@@ -74,7 +79,7 @@ export default function CheckoutShipping() {
                     <View className="relative flex-row items-center justify-between">
                         {/* Background Line */}
                         <View className="absolute left-0 top-1/2 h-[2px] w-full -translate-y-1/2 bg-gray-100" />
-                        
+
                         {/* Progress Line (50% for shipping) */}
                         <View className="absolute left-0 top-1/2 h-[2px] w-1/2 -translate-y-1/2 bg-black" />
 
@@ -129,21 +134,19 @@ export default function CheckoutShipping() {
                                 key={address.id}
                                 onPress={() => setSelectedAddress(address.id)}
                                 activeOpacity={0.7}
-                                className={`rounded-xl p-5 ${
-                                    selectedAddress === address.id
+                                className={`rounded-xl p-5 ${selectedAddress === address.id
                                         ? "border-2 border-black-600 bg-black-50"
                                         : "border border-gray-200 bg-white"
-                                }`}
+                                    }`}
                             >
                                 <View className="flex-row justify-between">
                                     <View className="flex-1">
                                         <View className="flex-row items-center gap-2">
                                             <Text
-                                                className={`text-xs font-bold uppercase tracking-widest ${
-                                                    selectedAddress === address.id
+                                                className={`text-xs font-bold uppercase tracking-widest ${selectedAddress === address.id
                                                         ? "text-black"
                                                         : "text-gray-400"
-                                                }`}
+                                                    }`}
                                             >
                                                 {address.label}
                                             </Text>
@@ -159,14 +162,13 @@ export default function CheckoutShipping() {
                                             {address.name}
                                         </Text>
                                     </View>
-                                    
+
                                     {/* Custom Radio */}
                                     <View
-                                        className={`h-5 w-5 items-center justify-center rounded-full border-2 ${
-                                            selectedAddress === address.id
+                                        className={`h-5 w-5 items-center justify-center rounded-full border-2 ${selectedAddress === address.id
                                                 ? "border-black"
                                                 : "border-gray-300"
-                                        }`}
+                                            }`}
                                     >
                                         {selectedAddress === address.id && (
                                             <View className="h-2.5 w-2.5 rounded-full bg-black" />
@@ -188,7 +190,7 @@ export default function CheckoutShipping() {
 
                                 {/* Edit Button */}
                                 {selectedAddress === address.id && (
-                                    <TouchableOpacity 
+                                    <TouchableOpacity
                                         className="absolute -right-2 -top-2 h-8 w-8 items-center justify-center rounded-full bg-white shadow-md"
                                     >
                                         <Ionicons name="pencil" size={14} color="#6b7280" />
@@ -233,8 +235,8 @@ export default function CheckoutShipping() {
                     <Text className="text-sm text-gray-500">Order Summary</Text>
                     <Text className="text-sm font-bold text-gray-900">$248.00</Text>
                 </View>
-                
-                <TouchableOpacity 
+
+                <TouchableOpacity
                     className="w-full flex-row items-center justify-center gap-2 rounded-xl bg-black py-4"
                     activeOpacity={0.8}
                 >

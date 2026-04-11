@@ -1,10 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Animated,
   FlatList,
-  Image,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -17,12 +17,23 @@ import {
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useCart, useRemoveCart } from "../../hooks/UseCart";
 import { colors } from "../../theme/colors";
 
 export default function CartPage() {
 
   const router = useRouter();
-  
+
+  const { data } = useCart();
+  const { mutate: removeCart } = useRemoveCart();
+
+
+  const cartItems = data?.items || [];
+
+  console.log("cartdetail", cartItems)
+
+
+
   const [cart, setCart] = useState([
     {
       id: "1",
@@ -79,8 +90,8 @@ export default function CartPage() {
     setCart((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const total = cart.reduce(
-    (sum, item) => sum + item.price * item.qty,
+  const total = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
     0
   );
 
@@ -105,27 +116,32 @@ export default function CartPage() {
     >
       <View className="relative">
         <Image
-          source={item.image}
-          className="h-28 w-20"
-          resizeMode="cover"
+          source={{
+            uri:
+              item.product?.images?.[0]
+          }}
+          style={{ width: 80, height: 110 }}
+          contentFit="cover"
+          transition={300}
+          cachePolicy="memory-disk"
         />
-        {item.qty > 1 && (
+        {item.quantity > 1 && (
           <View className="absolute -top-2 -right-2 bg-primary rounded-full w-6 h-6 items-center justify-center">
-            <Text className="text-black text-xs font-bold">{item.qty}</Text>
+            <Text className="text-black text-xs font-bold">{item.quantity}</Text>
           </View>
         )}
       </View>
 
       <View className="flex-1 ml-4">
         <Text className="text-xs font-medium text-gray-500">
-          {item.brand}
+          {item.product?.brand || "Brand"}
         </Text>
         <Text
           className="text-base font-semibold mt-1"
           style={{ color: colors.heading }}
           numberOfLines={2}
         >
-          {item.title}
+          {item.product?.name}
         </Text>
 
         <View className="flex-row items-center justify-between mt-2">
@@ -141,7 +157,7 @@ export default function CartPage() {
               </Pressable>
 
               <Text className="mx-4 text-base font-semibold" style={{ color: colors.heading }}>
-                {item.qty}
+                {item.quantity}
               </Text>
 
               <Pressable
@@ -155,7 +171,7 @@ export default function CartPage() {
 
             {/* Item Total */}
             <Text className="ml-4 text-lg font-bold" style={{ color: colors.primary }}>
-              ₹{item.price * item.qty}
+              ₹{item.price * item.quantity}
             </Text>
           </View>
         </View>
@@ -170,7 +186,7 @@ export default function CartPage() {
       </View>
 
       <Pressable
-        onPress={() => removeItem(item.id)}
+        onPress={() => removeCart(item.product?._id)}
         className="p-2 rounded-lg ml-2"
 
       >
@@ -205,7 +221,7 @@ export default function CartPage() {
               Shopping Cart
 
             </Text>
-          
+
 
             <TouchableOpacity className="h-10 w-10 items-center justify-center rounded-full relative">
               {/* <Ionicons name="bag-outline" size={24} color="#000" />
@@ -218,8 +234,8 @@ export default function CartPage() {
 
         {/* Cart List */}
         <FlatList
-          data={cart}
-          keyExtractor={(item) => item.id}
+          data={cartItems}
+          keyExtractor={(item) => item.product?._id?.toString()}
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ flexGrow: 1 }}
@@ -240,7 +256,7 @@ export default function CartPage() {
         />
 
         {/* Bottom Checkout Section */}
-        {cart.length > 0 && (
+        {cartItems.length > 0 && (
           <View className="bg-white border-t border-gray-200 pt-4 px-5 pb-4">
             <View className="flex-row justify-between items-center">
               <View>
@@ -311,30 +327,33 @@ export default function CartPage() {
               {/* Order Items */}
               <View className="px-5 py-4">
                 <Text className="text-lg font-semibold mb-3" style={{ color: colors.heading }}>
-                  Items ({cart.length})
+                  Items ({cartItems.length})
                 </Text>
-                {cart.map((item) => (
-                  <View key={item.id} className="flex-row items-center mb-4">
-                    <Image
-                      source={item.image}
-                      className="h-14 w-14 rounded-lg mr-3"
-                      resizeMode="cover"
-                    />
-                    <View className="flex-1">
-                      <Text className="font-medium" style={{ color: colors.heading }}>
-                        {item.title}
-                      </Text>
-                      <View className="flex-row justify-between items-center mt-1">
-                        <Text className="text-gray-500 text-sm">
-                          Qty: {item.qty} × ₹{item.price}
+                {cartItems.map((item) => {
+                  console.log("item2", item)
+                  return (
+                    <View key={item.product?._id} className="flex-row items-center mb-4">
+                      <Image
+                        source={{ uri: item.product?.images?.[0] }}
+                        className="h-14 w-14 rounded-lg mr-3"
+                        resizeMode="cover"
+                      />
+                      <View className="flex-1">
+                        <Text className="font-medium" style={{ color: colors.heading }}>
+                          {item.product?.name}
                         </Text>
-                        <Text className="font-semibold">
-                          ₹{item.price * item.qty}
-                        </Text>
+                        <View className="flex-row justify-between items-center mt-1">
+                          <Text className="text-gray-500 text-sm">
+                            Qty: {item.quantity} × ₹{item.price}
+                          </Text>
+                          <Text className="font-semibold">
+                            ₹{item.price * item.quantity}
+                          </Text>
+                        </View>
                       </View>
                     </View>
-                  </View>
-                ))}
+                  )
+                })}
               </View>
 
               {/* Price Breakdown */}
