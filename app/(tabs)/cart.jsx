@@ -249,6 +249,11 @@ export default function CartPage() {
       <Pressable
         onPress={() => {
           removeCart(item.product?._id)
+
+          Haptics.notificationAsync(
+            Haptics.NotificationFeedbackType.Success
+          );
+
           Toast.show({
             type: "success",
             text1: "Removed from Cart 🗑️",

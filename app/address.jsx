@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
@@ -11,6 +12,7 @@ import {
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 import { useAddAddress, useAddress, useEditAddress, useRemoveAddress } from "../hooks/UseAddress";
 
 export default function AddressScreen() {
@@ -272,6 +274,16 @@ export default function AddressScreen() {
                         onSuccess: () => {
                           setEditingId(null);
                           setModalVisible(false)
+                          Haptics.notificationAsync(
+                            Haptics.NotificationFeedbackType.Success
+                          )
+
+                          Toast.show({
+                            type: "success",
+                            text1: "Your Address Edited ✅",
+                            position: "top",
+                            visibilityTime: 2000,
+                          })
                         }
                       }
                     )
@@ -279,6 +291,16 @@ export default function AddressScreen() {
                     addAddress(form, {
                       onSuccess: () => {
                         setModalVisible(false);
+                        Haptics.notificationAsync(
+                          Haptics.NotificationFeedbackType.Success
+                        )
+
+                        Toast.show({
+                          type: "success",
+                          text1: "Add New Address Successfully ✅",
+                          position: "top",
+                          visibilityTime: 2000,
+                        })
                       }
 
                     })
