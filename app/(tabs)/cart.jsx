@@ -1,7 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Animated,
   FlatList,
@@ -16,7 +17,9 @@ import {
   TouchableWithoutFeedback,
   View
 } from "react-native";
+import ConfettiCannon from "react-native-confetti-cannon";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 import { useCart, useRemoveCart } from "../../hooks/UseCart";
 import { colors } from "../../theme/colors";
 
@@ -26,6 +29,8 @@ export default function CartPage() {
 
   const { data } = useCart();
   const { mutate: removeCart } = useRemoveCart();
+
+  const [showConfetti, setShowConfetti] = useState(false);
 
 
   const cartItems = data?.items || [];
@@ -67,6 +72,10 @@ export default function CartPage() {
   const [orderSummaryModal, setOrderSummaryModal] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [appliedPromo, setAppliedPromo] = useState(false);
+  const [couponError, setCouponError] = useState("")
+
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
 
   const increaseQty = (id) => {
     setCart((prev) =>
@@ -103,8 +112,60 @@ export default function CartPage() {
     if (promoCode.trim() === "SAVE10") {
       setAppliedPromo(true);
       setPromoCode("");
+
+      // 🔥 HAPTIC FEEDBACK
+      Haptics.notificationAsync(
+        Haptics.NotificationFeedbackType.Success
+      );
+
+      // 🎉 TOAST
+      Toast.show({
+        type: "success",
+        text1: "Coupon Applied 🎉",
+        text2: "You saved 10% instantly!",
+        position: "top",
+      });
+
+      // 💥 ANIMATION (bounce effect)
+      Animated.sequence([
+        Animated.timing(scaleAnim, {
+          toValue: 1.2,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          friction: 3,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      setShowConfetti(true)
+
+    } else {
+      setCouponError("Invalid coupan Code ❌");
+
+      Haptics.notificationAsync(
+        Haptics.NotificationFeedbackType.Error
+      );
+      Toast.show({
+        type: "error",
+        text1: "Invalid Coupon ❌",
+        text2: "Try SAVE10",
+      });
+
     }
   };
+
+  const errorShake = useRef(new Animated.Value(0)).current;
+
+  Animated.sequence([
+    Animated.timing(errorShake, { toValue: 10, duration: 50, useNativeDriver: true }),
+    Animated.timing(errorShake, { toValue: -10, duration: 50, useNativeDriver: true }),
+    Animated.timing(errorShake, { toValue: 6, duration: 50, useNativeDriver: true }),
+    Animated.timing(errorShake, { toValue: -6, duration: 50, useNativeDriver: true }),
+    Animated.timing(errorShake, { toValue: 0, duration: 50, useNativeDriver: true }),
+  ]).start();
 
   const removePromoCode = () => {
     setAppliedPromo(false);
@@ -186,7 +247,15 @@ export default function CartPage() {
       </View>
 
       <Pressable
-        onPress={() => removeCart(item.product?._id)}
+        onPress={() => {
+          removeCart(item.product?._id)
+          Toast.show({
+            type: "success",
+            text1: "Removed from Cart 🗑️",
+            text2: "Item removed successfully",
+            position: "top",
+          });
+        }}
         className="p-2 rounded-lg ml-2"
 
       >
@@ -225,9 +294,9 @@ export default function CartPage() {
 
             <TouchableOpacity className="h-10 w-10 items-center justify-center rounded-full relative">
               {/* <Ionicons name="bag-outline" size={24} color="#000" />
-              <View className="absolute top-1 right-1 h-4 w-4 items-center justify-center rounded-full bg-black">
-                <Text className="text-[10px] font-bold text-white">2</Text>
-              </View> */}
+                <View className="absolute top-1 right-1 h-4 w-4 items-center justify-center rounded-full bg-black">
+                  <Text className="text-[10px] font-bold text-white">2</Text>
+                </View> */}
             </TouchableOpacity>
           </View>
         </View>
@@ -302,6 +371,15 @@ export default function CartPage() {
           </TouchableWithoutFeedback>
 
           <View className="bg-white rounded-t-3xl absolute bottom-0 left-0 right-0 max-h-3/4">
+
+            {showConfetti && (
+              <ConfettiCannon
+                count={80}
+                origin={{ x: -10, y: 0 }}
+                fadeOut
+                onAnimationEnd={() => setShowConfetti(false)}
+              />
+            )}
             <ScrollView
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
@@ -377,7 +455,7 @@ export default function CartPage() {
 
                   {/* Promo Code Section */}
                   {appliedPromo ? (
-                    <View className="flex-row justify-between items-center bg-green-50 p-3 rounded-lg">
+                    <View className="flex-row justify-between items-center bg-green-50 p-3 m-2 rounded-lg">
                       <View className="flex-row items-center">
                         <Ionicons name="checkmark-circle" size={20} color="#059669" />
                         <Text className="text-green-700 font-medium ml-2">
@@ -397,8 +475,9 @@ export default function CartPage() {
                           placeholder="Enter promo code"
                           placeholderTextColor="#9CA3AF"
                           value={promoCode}
-                          onChangeText={setPromoCode}
+                          onChangeText={(text) => { setPromoCode(text), setCouponError("") }}
                           onSubmitEditing={applyPromoCode}
+
                         />
                         <Pressable
                           onPress={applyPromoCode}
@@ -412,6 +491,16 @@ export default function CartPage() {
                       </Text>
                     </View>
                   )}
+                  {couponError ? (
+                    <Animated.Text
+                      style={{
+                        transform: [{ translateX: errorShake }],
+                      }}
+                      className="text-red-500 text-sm mt-2"
+                    >
+                      {couponError}
+                    </Animated.Text>
+                  ) : null}
 
                   {discount > 0 && (
                     <View className="flex-row justify-between">
@@ -433,9 +522,11 @@ export default function CartPage() {
                       Inclusive of all taxes
                     </Text>
                   </View>
-                  <Text className="text-2xl font-bold" style={{ color: colors.primary }}>
-                    ₹{grandTotal}
-                  </Text>
+                  <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+                    <Text className="text-2xl font-bold" style={{ color: colors.primary }}>
+                      ₹{grandTotal}
+                    </Text>
+                  </Animated.View>
                 </View>
               </View>
 

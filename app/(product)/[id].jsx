@@ -15,6 +15,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useAddCart, useCart } from "../../hooks/UseCart";
 import { useProduct } from "../../hooks/UseProduct";
 
+import * as Haptics from "expo-haptics";
+import Toast from "react-native-toast-message";
+
 const { width } = Dimensions.get("window");
 
 export default function ProductDetails() {
@@ -35,7 +38,7 @@ export default function ProductDetails() {
   // const {mutate:addTocart } = useCart
   const { data } = useCart();
   const cartItems = data?.items || [];
-  const { mutate: addTocart } = useAddCart();
+  const { mutate: addTocart, isPending  } = useAddCart();
 
   // console.log("product detail", product);
 
@@ -342,17 +345,49 @@ export default function ProductDetails() {
               addTocart({
                 productId,
                 quantity: Number(quantity)
-              });
+              },
+
+                {
+                  onSuccess: () => {
+                    // 🔥 Haptic Feedback
+                    Haptics.notificationAsync(
+                      Haptics.NotificationFeedbackType.Success
+                    );
+
+                    // 🔥 Toast
+                    Toast.show({
+                      type: "success",
+                      text1: "Added to Cart",
+                      text2: `${product.name} added successfully`,
+                      position: "top",
+                    });
+                  },
+
+                  onError: () => {
+                    Haptics.notificationAsync(
+                      Haptics.NotificationFeedbackType.Error
+                    );
+
+                    Toast.show({
+                      type: "error",
+                      text1: "Failed ❌",
+                      text2: "Something went wrong",
+                      position: "top",
+                    });
+                  },
+                }
+
+              );
             }}
             className="flex-1 h-14 items-center justify-center rounded-xl bg-black"
             activeOpacity={0.8}
           >
             <Text className="text-base font-bold text-white">
-              Add to Cart
+              {isPending  ? "Adding..." : "Add to Cart"}
             </Text>
           </TouchableOpacity>
         </View>
       </View>
-    </SafeAreaView>
+    </SafeAreaView >
   );
 }

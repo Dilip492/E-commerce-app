@@ -4,7 +4,10 @@ import * as SecureStore from "expo-secure-store";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 import queryClient from "../hooks/queryClient";
+import { toastConfig } from "../utils/toastconfig";
+
 
 SplashScreen.preventAutoHideAsync();
 
@@ -39,7 +42,10 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
+        <>
         <Stack screenOptions={{ headerShown: false }} />
+        <Toast config={toastConfig} />
+        </>
       </QueryClientProvider>
     </SafeAreaProvider>
   );
