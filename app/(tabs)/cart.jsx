@@ -272,9 +272,9 @@ export default function CartPage() {
         keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
       >
         {/* Header */}
-        <View className="px-5 pt-4  bg-white border-b border-gray-100">
+        <View className=" bg-gray-100 border-b border-gray-100">
 
-          <View className="flex-row items-center justify-between  py-3 border-b border-gray-200">
+          <View className="flex-row items-center justify-between px-4  py-3 border-b border-gray-200">
             <TouchableOpacity
               onPress={() => router.back()}
               className="h-10 w-10 items-center justify-center rounded-full"
@@ -324,36 +324,52 @@ export default function CartPage() {
           }
         />
 
-        {/* Bottom Checkout Section */}
-        {cartItems.length > 0 && (
-          <View className="bg-white border-t border-gray-200 pt-4 px-5 pb-4">
-            <View className="flex-row justify-between items-center">
-              <View>
-                <Text className="text-gray-600">Total</Text>
-                <Text className="text-2xl font-bold" style={{ color: colors.primary }}>
-                  ₹{total}
-                </Text>
-              </View>
-              <Pressable
-                onPress={() => setOrderSummaryModal(true)}
-                className="py-3 px-8 rounded-xl shadow-lg"
-                style={{
-                  backgroundColor: colors.primary,
-                  shadowColor: colors.primary,
-                  shadowOffset: { width: 0, height: 4 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 8,
-                  elevation: 5,
-                }}
-              >
-                <Text className="text-white font-bold text-lg">
-                  Checkout
-                </Text>
-              </Pressable>
+      </KeyboardAvoidingView>
+      {/* Bottom Checkout Section */}
+      {cartItems.length > 0 && (
+        <View
+          className="bg-white px-6 pt-4 pb-6"
+          style={{
+            borderTopWidth: 1,
+            borderColor: "#eee",
+          }}
+        >
+          {/* 💰 TOTAL CARD */}
+          <View
+            className="flex-row justify-between items-center px-3 py-3 rounded-2xl mb-4"
+            style={{
+              backgroundColor: "#f9f9f9",
+              borderWidth: 1,
+              borderColor: "#eee",
+            }}
+          >
+            <View>
+              <Text className="text-gray-500 text-xs uppercase tracking-wider">
+                Total Amount
+              </Text>
+              <Text className="text-black text-2xl font-extrabold mt-1">
+                ₹{total}
+              </Text>
+            </View>
+
+            <View className="bg-black/5 p-3 rounded-full">
+              <Ionicons name="wallet-outline" size={20} color="#000" />
             </View>
           </View>
-        )}
-      </KeyboardAvoidingView>
+
+          {/* 🚀 BUTTON */}
+          <Pressable
+            onPress={() => setOrderSummaryModal(true)}
+            className="flex-row items-center justify-center py-4 rounded-xl mb-2 bg-black"
+          >
+            <Text className="text-white font-bold text-base mr-2">
+              Proceed to Checkout
+            </Text>
+
+            <Ionicons name="arrow-forward" size={20} color="#fff" />
+          </Pressable>
+        </View>
+      )}
 
       {/* Order Summary Modal */}
       <Modal

@@ -126,7 +126,7 @@ export default function Index() {
   return (
     // className="flex-1 bg-white"
     <SafeAreaView style={{ flex: 1 }}>
-      <StatusBar barStyle="dark-content" backgroundColor="white" />
+      <StatusBar barStyle="dark-content" backgroundColor="#f3f4f6" />
       <ScrollView showsVerticalScrollIndicator={false}>
 
         {/* Header */}

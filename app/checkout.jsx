@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     ScrollView,
     StatusBar,
@@ -10,16 +10,25 @@ import {
     View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useAddress } from "../hooks/UseAddress";
+import { useAddAddress, useAddress } from "../hooks/UseAddress";
 
 export default function CheckoutShipping() {
     const router = useRouter();
-    const [selectedAddress, setSelectedAddress] = useState("home");
+    const [selectedAddress, setSelectedAddress] = useState(null);
     const [deliveryInstructions, setDeliveryInstructions] = useState("");
 
     const { data } = useAddress();
 
+
+
     console.log(data);
+
+    useEffect(() => {
+        const defaultAddr = data.find(a => a.isDefault);
+        if (defaultAddr) {
+            setSelectedAddress(defaultAddr._id);
+        }
+    }, [addresses]);
 
     const addresses = [
         {
@@ -129,28 +138,28 @@ export default function CheckoutShipping() {
 
                     {/* Address List */}
                     <View className="space-y-4">
-                        {addresses.map((address) => (
+                        {data?.map((address) => (
                             <TouchableOpacity
-                                key={address.id}
-                                onPress={() => setSelectedAddress(address.id)}
+                                key={address._id}
+                                onPress={() => setSelectedAddress(address._id)}
                                 activeOpacity={0.7}
-                                className={`rounded-xl p-5 ${selectedAddress === address.id
-                                        ? "border-2 border-black-600 bg-black-50"
-                                        : "border border-gray-200 bg-white"
+                                className={`rounded-xl p-5 mt-2 ${selectedAddress === address._id
+                                    ? "border-2 border-black-600 bg-black-50"
+                                    : "border border-gray-200 bg-white"
                                     }`}
                             >
                                 <View className="flex-row justify-between">
                                     <View className="flex-1">
                                         <View className="flex-row items-center gap-2">
                                             <Text
-                                                className={`text-xs font-bold uppercase tracking-widest ${selectedAddress === address.id
-                                                        ? "text-black"
-                                                        : "text-gray-400"
+                                                className={`text-xs font-bold uppercase tracking-widest ${selectedAddress === address._id
+                                                    ? "text-black"
+                                                    : "text-gray-400"
                                                     }`}
                                             >
-                                                {address.label}
+                                                {address.isDefault ? "DEfault" : " "}
                                             </Text>
-                                            {address.id === "home" && (
+                                            {address.isDefault && (
                                                 <View className="rounded-full bg-green-100 px-2 py-0.5">
                                                     <Text className="text-[8px] font-bold text-green-700">
                                                         DEFAULT
@@ -159,37 +168,33 @@ export default function CheckoutShipping() {
                                             )}
                                         </View>
                                         <Text className="mt-1 text-lg font-bold text-gray-900">
-                                            {address.name}
+                                            {address.fullName}
                                         </Text>
                                     </View>
 
                                     {/* Custom Radio */}
                                     <View
-                                        className={`h-5 w-5 items-center justify-center rounded-full border-2 ${selectedAddress === address.id
-                                                ? "border-black"
-                                                : "border-gray-300"
+                                        className={`h-5 w-5 items-center justify-center rounded-full border-2 ${selectedAddress === address._id
+                                            ? "border-black"
+                                            : "border-gray-300"
                                             }`}
                                     >
-                                        {selectedAddress === address.id && (
+                                        {selectedAddress === address._id && (
                                             <View className="h-2.5 w-2.5 rounded-full bg-black" />
                                         )}
                                     </View>
                                 </View>
-
                                 <View className="mt-3 space-y-1">
-                                    <Text className="text-sm text-gray-600">
-                                        {address.addressLine1}
-                                    </Text>
-                                    <Text className="text-sm text-gray-600">
-                                        {address.addressLine2}
-                                    </Text>
-                                    <Text className="pt-2 text-xs font-medium text-gray-400">
-                                        {address.phone}
+                                    <Text className="text-gray-600 mt-1">
+                                        {address.addressLine}{"\n"}
+                                        {address.city}, {address.state} {address.pincode}{"\n"}
+                                        {address.country}
                                     </Text>
                                 </View>
 
+                                <Text className="text-gray-600 mt-2">{address.phone}</Text>
                                 {/* Edit Button */}
-                                {selectedAddress === address.id && (
+                                {selectedAddress === address._id && (
                                     <TouchableOpacity
                                         className="absolute -right-2 -top-2 h-8 w-8 items-center justify-center rounded-full bg-white shadow-md"
                                     >
@@ -201,7 +206,7 @@ export default function CheckoutShipping() {
                     </View>
 
                     {/* Add New Address Button */}
-                    <TouchableOpacity className="mt-6 flex-row items-center justify-center gap-2 rounded-xl border border-dashed border-gray-300 py-5">
+                    <TouchableOpacity onPress={() => { router.push("/address") }} className="mt-6 flex-row items-center justify-center gap-2 rounded-xl border border-dashed border-gray-300 py-5">
                         <Ionicons name="add" size={20} color="#6b7280" />
                         <Text className="text-sm font-semibold text-gray-500">
                             Add New Address
