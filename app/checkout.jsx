@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
     ScrollView,
     StatusBar,
@@ -10,7 +10,8 @@ import {
     View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useAddAddress, useAddress } from "../hooks/UseAddress";
+import { useAddress } from "../hooks/UseAddress";
+import { useCart } from "../hooks/UseCart";
 
 export default function CheckoutShipping() {
     const router = useRouter();
@@ -19,12 +20,17 @@ export default function CheckoutShipping() {
 
     const { data } = useAddress();
 
+    const { data: cartdata } = useCart();
+
+    console.log("amount " , cartdata)
+
 
 
     console.log(data);
 
     useEffect(() => {
-        const defaultAddr = data.find(a => a.isDefault);
+
+        const defaultAddr = data?.find(a => a.isDefault);
         if (defaultAddr) {
             setSelectedAddress(defaultAddr._id);
         }
@@ -71,7 +77,7 @@ export default function CheckoutShipping() {
                     >
                         <Ionicons name="chevron-back" size={24} color="#0e121b" />
                     </TouchableOpacity>
-                    <Text className="text-sm font-semibold uppercase tracking-widest text-gray-500">
+                    <Text className="text-xl font-bold tracking-tight text-black">
                         Checkout
                     </Text>
                     <View className="w-10" />
@@ -238,20 +244,20 @@ export default function CheckoutShipping() {
             <View className="absolute bottom-0 left-0 right-0 border-t border-gray-200 bg-white px-6 pb-8 pt-4">
                 <View className="mb-3 flex-row items-center justify-between">
                     <Text className="text-sm text-gray-500">Order Summary</Text>
-                    <Text className="text-sm font-bold text-gray-900">$248.00</Text>
+                    <Text className="text-sm font-bold text-gray-900">₹{cartdata.totalAmount}.00</Text>
                 </View>
 
                 <TouchableOpacity
-                    className="w-full flex-row items-center justify-center gap-2 rounded-xl bg-black py-4"
+                    className="w-full flex-row items-center justify-center gap-2 rounded-xl bg-black py-4 "
                     activeOpacity={0.8}
                 >
-                    <Text className="text-sm font-bold text-white">Continue to Payment</Text>
+                    <Text className="text-base font-bold text-white">Continue to Payment</Text>
                     <Ionicons name="arrow-forward-outline" size={18} color="#fff" />
                 </TouchableOpacity>
             </View>
 
             {/* iOS Home Indicator */}
-            <View className="absolute bottom-1 left-1/2 h-1 w-32 -translate-x-1/2 rounded-full bg-gray-300" />
+            {/* <View className="absolute bottom-1 left-1/2 h-1 w-32 -translate-x-1/2 rounded-full bg-gray-300" /> */}
         </View>
     );
 }

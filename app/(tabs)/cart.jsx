@@ -104,7 +104,7 @@ export default function CartPage() {
     0
   );
 
-  const deliveryCharge = total > 2000 ? 0 : 99;
+  const deliveryCharge = total > 2000 ? 0 : 0;
   const discount = appliedPromo ? Math.round(total * 0.1) : 0; // 10% discount example
   const grandTotal = total + deliveryCharge - discount;
 

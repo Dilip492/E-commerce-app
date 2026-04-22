@@ -37,7 +37,7 @@ export default function Index() {
           Image.prefetch(item.images[0]);
         }
       });
-    }
+    } 
   }, [product]);
 
   const router = useRouter();

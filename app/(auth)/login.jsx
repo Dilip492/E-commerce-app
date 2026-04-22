@@ -1,4 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
+import * as Haptics from "expo-haptics";
 import { useRouter } from 'expo-router';
 import * as SecureStore from "expo-secure-store";
 import { useState } from 'react';
@@ -13,7 +14,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { loginApi } from '../../api/auth.api';
+import Toast from "react-native-toast-message";
+
+
+import { UseLogin } from "../../hooks/UseAuth";
 
 // import { loginApi } from "../../api/auth.api";
 // import { signInWithGoogle } from '../services/authService';
@@ -24,15 +28,28 @@ const LoginScreen = () => {
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
-  const logindata = { email, password };
+  const { mutate, isPending } = UseLogin();
+
 
 
 
   const router = useRouter();
   const handleLogin = async () => {
-    setLoading(true)
+    // setLoading(true)
     if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+      // Alert.alert('Error', 'Please fill in all fields');
+      // 🔥 HAPTIC FEEDBACK
+      Haptics.notificationAsync(
+        Haptics.NotificationFeedbackType.Warning
+      );
+
+      // 🎉 TOAST
+      Toast.show({
+        type: "error",
+        text1: "Please fill in all fields",
+        position: "top",
+      });
+
       return;
     }
 
@@ -41,32 +58,32 @@ const LoginScreen = () => {
     // Handle email/password login here
     console.log('Login with:', logindata);
     // loginApi(logindata)
-    try {
-      const response = await loginApi(logindata);
 
-      // 🔥 THIS IS YOUR OUTPUT
-      // const response = await loginApi(logindata);
+    const logindata = { email, password };
 
-      await SecureStore.setItemAsync(
-        "accessToken",
-        response.data.token
-      );
+    mutate(logindata, {
+      onSuccess: async (data) => {
+        await SecureStore.setItemAsync(
+          "accessToken",
+          data?.data?.token
+        );
 
-      setLoading(false);
-      console.log("Server response:", response.data);
+        // console.log("Server response:", data?.data?.token);
 
-      // Alert.alert("Success", "Login successful");
-      router.replace('/(tabs)')
-      // router.replace('/(tabs)/index')
+        router.replace('/(tabs)');
+      },
+      onError: (error) => {
+        console.log("login error", error);
+        Toast.show({
+          type: "error",
+          text1: "Login Failed",
+          text2: error?.response?.data?.message || "Please try again",
+          position: "top",
+          visibilityTime: 3000,
+        });
+      }
+    })
 
-    } catch (error) {
-      console.log("Login error:", error);
-
-      Alert.alert(
-        "Error",
-        error?.response?.data?.message || "Something went wrong"
-      );
-    }
   };
 
   const handleGoogleLogin = async () => {
@@ -140,7 +157,7 @@ const LoginScreen = () => {
               disabled={loading}
             >
               <Text className="text-white text-lg font-semibold  ">
-                {loading ? 'Signing in...' : 'Sign In'}
+                {isPending ? 'Signing in...' : 'Sign In'}
               </Text>
             </TouchableOpacity>
 
