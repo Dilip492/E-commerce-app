@@ -17,6 +17,7 @@ export default function useWishlist() {
   // ✅ ADD to wishlist
   const addMutation = useMutation({
     mutationFn: async (productId) => {
+      console.log("ADD API CALL:", productId);
       const res = await addTowishlist(productId);
       // console.log("API Response:", res);
       return res;
@@ -46,18 +47,17 @@ export default function useWishlist() {
   });
 
   // ✅ REMOVE from wishlist
+  // ✅ REMOVE from wishlist
   const removeMutation = useMutation({
     mutationFn: (id) => removewishlist(id),
 
-    onMutate: async (id) => {
-      await queryClient.cancelQueries(["wishlist"]);
+    onMutate: async (productId) => {
+      await queryClient.cancelQueries({ queryKey: ["wishlist"] });
 
       const previousWishlist = queryClient.getQueryData(["wishlist"]);
 
       queryClient.setQueryData(["wishlist"], (old = []) =>
-        old.filter((item) =>
-          (item._id || item) !== id // ✅ handles object + string
-        )
+        old.filter((item) => item._id !== productId)
       );
 
       return { previousWishlist };
@@ -67,7 +67,7 @@ export default function useWishlist() {
     },
 
     onSettled: () => {
-      queryClient.invalidateQueries(["wishlist"]);
+      queryClient.invalidateQueries({ queryKey: ["wishlist"] });
     },
   });
 

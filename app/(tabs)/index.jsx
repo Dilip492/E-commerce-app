@@ -12,7 +12,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+// import LinearGradient from "react-native-linear-gradient";
+import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
+import ShimmerPlaceHolder from "react-native-shimmer-placeholder";
 import "../../global.css";
 import { useProducts } from "../../hooks/UseProducts";
 // import UseWishlist from "../../hooks/UseWishlist";
@@ -23,7 +26,9 @@ export default function Index() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [activeBrand, setActiveBrand] = useState("puma");
 
-  const { product, loading } = useProducts();
+  const { product } = useProducts();
+
+  const [loading, setLoading] = useState(true);
 
   // const { wishlist, setWishlist, addtowishlist, removeFromWishlist } = UseWishlist();
   const { wishlist, addtowishlist, removeFromWishlist } = useWishlist();
@@ -37,7 +42,7 @@ export default function Index() {
           Image.prefetch(item.images[0]);
         }
       });
-    } 
+    }
   }, [product]);
 
   const router = useRouter();
@@ -46,8 +51,14 @@ export default function Index() {
 
 
   const isInWishlist = (id) => {
-    return wishlist.some((item) => item._id === id);
+    if (!wishlist) return false;
+    return wishlist.some((item) => {
+      const compareId = item._id || item;
+      return String(compareId) === String(id);
+    });
   };
+
+
   // const toggleFavorite = async (productId) => {
   //   try {
 
@@ -246,17 +257,30 @@ export default function Index() {
               activeOpacity={0.7}>
               {/* Product Image with Heart Icon */}
               <View className="relative">
+                {loading && (
+                  <ShimmerPlaceHolder
+                    LinearGradient={LinearGradient}
+                    style={{ width: "100%", height: 150, borderRadius: 10 }}
+                  />
+                )}
                 <Image
                   source={item.images?.length ? item.images[0] : require("../../assets/images/product.jpg")}
                   style={{ width: "100%", height: 256, borderRadius: 12 }}
                   contentFit="cover"
                   transition={300}
                   cachePolicy="memory-disk"
+                  onLoadEnd={() => setLoading(false)}
                 />
                 {/* Heart Button - THIS WORKS! */}
                 <TouchableOpacity
                   // onPress={() => toggleFavorite(item.id)}
-                  onPress={() => isInWishlist(item._id) ? removeFromWishlist(item._id) : addtowishlist(item._id)}
+                  onPress={() => {
+                    console.log("clicked", item._id);
+                    isInWishlist(item._id) ? removeFromWishlist(item._id) : addtowishlist(item._id)
+
+                  }
+
+                  }
                   className="absolute right-2 top-2 bg-white p-2 rounded-full shadow-sm"
                   style={{ elevation: 2 }} // Small shadow for Android
                 >

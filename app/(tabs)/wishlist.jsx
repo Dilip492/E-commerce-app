@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
+
 import {
   Dimensions,
   // Image,
@@ -9,10 +10,12 @@ import {
   StatusBar,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
+// useEffect
 import { SafeAreaView } from "react-native-safe-area-context";
 // import UseWishlist from "../../hooks/UseWishlist";
+
 import UseWishlist from "../../hooks/UseWishlist";
 
 const { width } = Dimensions.get('window');
@@ -26,6 +29,12 @@ export default function Wishlist() {
 
   const { wishlist, removeFromWishlist } = UseWishlist();
 
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     wishlist(); // 👈 refetch data when screen opens
+  //   }, [])
+  // );
   // console.log("whishlist page ", wishlist);
   // const [wishlistItems, setWishlistItems] = useState([
   //   {
@@ -114,12 +123,12 @@ export default function Wishlist() {
       >
         <View className="flex-row flex-wrap justify-between">
           {wishlist.map((item) => (
-            <View key={item._id} style={{ width: CARD_WIDTH, marginBottom: 32 }}>
+            <View key={item._id?.toString() || item.toString()} style={{ width: CARD_WIDTH, marginBottom: 32 }}>
               <View className="flex-col">
                 {/* Product Image */}
                 <View className="relative aspect-[3/4] overflow-hidden rounded-lg bg-gray-100">
                   <Image
-                    source={item.images[0]}
+                    source={{ uri: item.images[0] }}
                     style={{ width: "100%", height: 256, borderRadius: 12 }}
                     contentFit="cover"
                     transition={300}
@@ -128,8 +137,13 @@ export default function Wishlist() {
 
                   {/* Remove Button */}
                   <TouchableOpacity
-                    // onPress={() => removeItem(item.id)}
-                    onPress={() => removeFromWishlist(item._id)}
+
+                    onPress={() => {
+
+                      const idToDelete = (item._id ?? item).toString(); // ✅ normalize
+                      removeFromWishlist(idToDelete);
+                    }}
+
                     className="absolute top-2 right-2 w-8 h-8 items-center justify-center rounded-full bg-white/90"
                   >
                     <Ionicons name="close" size={16} color="#333" />
@@ -163,7 +177,7 @@ export default function Wishlist() {
             </Text>
           </TouchableOpacity>
         </View>
-      </ScrollView>
-    </View>
+      </ScrollView >
+    </View >
   );
 }

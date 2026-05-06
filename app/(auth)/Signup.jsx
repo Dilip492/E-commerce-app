@@ -12,7 +12,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { registerApi } from '../../api/auth.api';
+
 // import { signInWithGoogle } from '../services/authService';
 
 const SignUpScreen = () => {
@@ -30,13 +32,26 @@ const SignUpScreen = () => {
   const handleSignUp = async () => {
 
     if (!name || !email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+      // Alert.alert('Error', 'Please fill in all fields');
+      Toast.show(
+        {
+          type: 'error',
+          text1: "Please fill in all fields",
+          position: "top"
+        }
+      )
+
       return;
     }
 
 
     if (password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters');
+      // Alert.alert('Error', 'Password must be at least 6 charactersPassword must be at least 6 characters');
+      Toast.show({
+        type: 'error',
+        text1: "Password must be at least 6 characters",
+        position: "top"
+      })
       return;
     }
 
@@ -51,7 +66,12 @@ const SignUpScreen = () => {
 
       // console.log(response.data);
       if (response.status === 200) {
-        Alert.alert("Success", "OTP sent to your email");
+        // Alert.alert("Success", "OTP sent to your email");
+        Toast.show({
+          type: "success",
+          text1: "OTP sent to your email",
+          position: "top"
+        })
 
         console.log(response.data);
 
@@ -66,7 +86,13 @@ const SignUpScreen = () => {
       // router.push('/login');
     } catch (error) {
       console.log("Signup error:", error?.response?.data || error.message);
-      Alert.alert('Error', 'Registration failed');
+      // Alert.alert('Error', 'Registration failed');
+      Toast.show({
+        type:'error',
+        text1:"Something Went Wrong",
+        text2:"Registration failed",
+        position:"bottom"
+      })
     } finally {
       setLoading(false);
     }

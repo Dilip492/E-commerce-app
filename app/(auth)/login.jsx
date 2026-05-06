@@ -68,7 +68,7 @@ const LoginScreen = () => {
           data?.data?.token
         );
 
-        // console.log("Server response:", data?.data?.token);
+        console.log("Server response:", data?.status);
 
         router.replace('/(tabs)');
       },

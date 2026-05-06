@@ -2,7 +2,7 @@ import api from './client'
 
 
 export const addTowishlist = (productId) => {
-    return api.post("/api/user/wishlist", { productId: productId })
+    return api.post("/api/user/wishlist", { productId })
 }
 
 export const getwishlist = () => {

@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -12,6 +13,7 @@ import {
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import ShimmerPlaceHolder from "react-native-shimmer-placeholder";
 import { useAddCart, useCart } from "../../hooks/UseCart";
 import { useProduct } from "../../hooks/UseProduct";
 
@@ -30,6 +32,7 @@ export default function ProductDetails() {
   const [activeImage, setActiveImage] = useState(0);
   const [productDetailsExpanded, setProductDetailsExpanded] = useState(true);
   const [shippingExpanded, setShippingExpanded] = useState(false);
+const [imageLoading, setImageLoading] = useState({});
 
   const { product, loading } = useProduct(id);
 
@@ -38,7 +41,7 @@ export default function ProductDetails() {
   // const {mutate:addTocart } = useCart
   const { data } = useCart();
   const cartItems = data?.items || [];
-  const { mutate: addTocart, isPending  } = useAddCart();
+  const { mutate: addTocart, isPending } = useAddCart();
 
   // console.log("product detail", product);
 
@@ -99,16 +102,37 @@ export default function ProductDetails() {
               );
               setActiveImage(slideIndex);
             }}
-            renderItem={({ item }) => (
-              <Image
-                source={{ uri: item }}
-                style={{ width: width, height: "100%" }}
-                // resizeMode="cover"
-                contentFit="cover"
-                transition={300}
-                cachePolicy="memory-disk"
+            renderItem={({ item, index }) => (
+              
+              <View style={{ width: width, height: "100%" }}>
 
-              />
+                {/* Skeleton */}
+                {imageLoading[index] !== false && (
+                  <ShimmerPlaceHolder
+                    LinearGradient={LinearGradient}
+                    style={{
+                      width: width,
+                      height: "100%",
+                      position: "absolute",
+                    }}
+                  />
+                )}
+
+                {/* Image */}
+                <Image
+                  source={{ uri: item }}
+                  style={{ width: width, height: "100%" }}
+                  contentFit="cover"
+                  transition={300}
+                  cachePolicy="memory-disk"
+                  onLoadEnd={() =>
+                    setImageLoading((prev) => ({
+                      ...prev,
+                      [index]: false,
+                    }))
+                  }
+                />
+              </View>
             )}
           />
 
@@ -383,7 +407,7 @@ export default function ProductDetails() {
             activeOpacity={0.8}
           >
             <Text className="text-base font-bold text-white">
-              {isPending  ? "Adding..." : "Add to Cart"}
+              {isPending ? "Adding..." : "Add to Cart"}
             </Text>
           </TouchableOpacity>
         </View>
