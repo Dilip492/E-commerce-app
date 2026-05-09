@@ -32,7 +32,7 @@ export default function ProductDetails() {
   const [activeImage, setActiveImage] = useState(0);
   const [productDetailsExpanded, setProductDetailsExpanded] = useState(true);
   const [shippingExpanded, setShippingExpanded] = useState(false);
-const [imageLoading, setImageLoading] = useState({});
+  const [imageLoading, setImageLoading] = useState({});
 
   const { product, loading } = useProduct(id);
 

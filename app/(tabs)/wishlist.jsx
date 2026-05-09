@@ -21,6 +21,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 // import UseWishlist from "../../hooks/UseWishlist";
 
+import { useAddCart } from "../../hooks/UseCart";
 import UseWishlist from "../../hooks/UseWishlist";
 
 const { width } = Dimensions.get('window');
@@ -33,6 +34,7 @@ export default function Wishlist() {
 
 
   const { wishlist, removeFromWishlist } = UseWishlist();
+  const { mutate: addTocart, isPending } = useAddCart();
 
   // const { wishlist, removeFromWishlist } = UseWishlist();
   const queryClient = useQueryClient();
@@ -44,6 +46,8 @@ export default function Wishlist() {
       });
     }, [])
   );
+
+
 
 
   // useFocusEffect(
@@ -91,13 +95,42 @@ export default function Wishlist() {
   //   },
   // ]);
 
-  const removeItem = (id) => {
+  const removeItem = (item) => {
     // setWishlistItems(prev => prev.filter(item => item.id !== id));
+    const idToDelete = (item._id ?? item).toString();
+    removeFromWishlist(idToDelete);
   };
 
-  const addAllToCart = () => {
-    // Handle adding all items to cart
-    // console.log("Adding all to cart:", wishlistItems);
+  const addAllToCart = async () => {
+    try {
+
+      const validItems = wishlist.filter(
+        (item) => item?._id
+      );
+
+
+      // This Promise call every id so the all items add to cart in one press
+
+      await Promise.all(
+        validItems.map(async (item) => {
+
+          const productId = Array.isArray(item._id) ? item._id[0] : item._id;
+
+          console.log("SENDING:", productId);
+
+          await addTocart({
+            productId,
+            quantity: 1,
+          });
+
+        })
+      );
+
+      console.log("All items added to cart");
+
+    } catch (error) {
+      console.log("Add all cart error:", error);
+    }
   };
 
   return (
@@ -155,11 +188,7 @@ export default function Wishlist() {
                     {/* Remove Button */}
                     <TouchableOpacity
 
-                      onPress={() => {
-
-                        const idToDelete = (item._id ?? item).toString(); // ✅ normalize
-                        removeFromWishlist(idToDelete);
-                      }}
+                      onPress={() => removeItem(item)}
 
                       className="absolute top-2 right-2 w-8 h-8 items-center justify-center rounded-full bg-white/90"
                     >

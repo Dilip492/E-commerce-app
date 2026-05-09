@@ -31,7 +31,7 @@ export default function ProfileScreen() {
 
         }, [])
     );
-    
+
     console.log("user info", User)
 
     const menuItems = [
