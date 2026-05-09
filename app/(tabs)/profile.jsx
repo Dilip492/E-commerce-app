@@ -1,6 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { useFocusEffect, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
+import { useCallback } from "react";
 import {
     ScrollView,
     StatusBar,
@@ -18,6 +20,18 @@ export default function ProfileScreen() {
     // const [name, setName] = useState(null)
 
     const { User } = Useuser();
+
+    const queryClient = useQueryClient();
+
+    useFocusEffect(
+        useCallback(() => {
+            queryClient.invalidateQueries({
+                queryKey: ["User"],
+            });
+
+        }, [])
+    );
+    
     console.log("user info", User)
 
     const menuItems = [

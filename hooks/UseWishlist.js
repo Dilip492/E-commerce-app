@@ -10,6 +10,7 @@ export default function useWishlist() {
     queryKey: ["wishlist"],
     queryFn: async () => {
       const res = await getwishlist();
+      // console.log("REAL WISHLIST FROM BACKEND:", res);
       return res?.data || [];
     },
   });
@@ -17,21 +18,25 @@ export default function useWishlist() {
   // ✅ ADD to wishlist
   const addMutation = useMutation({
     mutationFn: async (productId) => {
-      console.log("ADD API CALL:", productId);
+      // console.log("ADD MUTATION RUNNING");
+      // console.log("ADDING:", productId);
+      // console.log("ADD API CALL:", productId);
       const res = await addTowishlist(productId);
+      // console.log("ADD RESPONSE:", res.data);
+
       // console.log("API Response:", res);
       return res;
     },
 
     // 🔥 Optimistic update (instant UI update)
     onMutate: async (productId) => {
-      await queryClient.cancelQueries(["wishlist"]);
+      await queryClient.cancelQueries({ queryKey: ["wishlist"] });
 
       const previousWishlist = queryClient.getQueryData(["wishlist"]);
 
       queryClient.setQueryData(["wishlist"], (old = []) => [
         ...old,
-        productId, // just store id if backend stores only id
+        productId,
       ]);
 
       return { previousWishlist };
@@ -47,27 +52,45 @@ export default function useWishlist() {
   });
 
   // ✅ REMOVE from wishlist
-  // ✅ REMOVE from wishlist
   const removeMutation = useMutation({
-    mutationFn: (id) => removewishlist(id),
+    mutationFn: async (productId) => {
+      return await removewishlist(productId);
+    },
 
     onMutate: async (productId) => {
-      await queryClient.cancelQueries({ queryKey: ["wishlist"] });
+      await queryClient.cancelQueries({
+        queryKey: ["wishlist"],
+      });
 
-      const previousWishlist = queryClient.getQueryData(["wishlist"]);
+      const previousWishlist =
+        queryClient.getQueryData(["wishlist"]);
 
-      queryClient.setQueryData(["wishlist"], (old = []) =>
-        old.filter((item) => item._id !== productId)
+      queryClient.setQueryData(
+        ["wishlist"],
+        (old = []) =>
+          old.filter((item) => {
+            const currentId =
+              item?._id?.toString() ||
+              item?.toString();
+
+            return currentId !== productId.toString();
+          })
       );
 
       return { previousWishlist };
     },
-    onError: (err, id, context) => {
-      queryClient.setQueryData(["wishlist"], context.previousWishlist);
+
+    onError: (err, productId, context) => {
+      queryClient.setQueryData(
+        ["wishlist"],
+        context.previousWishlist
+      );
     },
 
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["wishlist"] });
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["wishlist"],
+      });
     },
   });
 

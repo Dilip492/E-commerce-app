@@ -1,6 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useQueryClient } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
+
+
+import { useFocusEffect } from "expo-router";
+import { useCallback } from "react";
 
 import {
   Dimensions,
@@ -28,6 +33,17 @@ export default function Wishlist() {
 
 
   const { wishlist, removeFromWishlist } = UseWishlist();
+
+  // const { wishlist, removeFromWishlist } = UseWishlist();
+  const queryClient = useQueryClient();
+
+  useFocusEffect(
+    useCallback(() => {
+      queryClient.invalidateQueries({
+        queryKey: ["wishlist"],
+      });
+    }, [])
+  );
 
 
   // useFocusEffect(
@@ -122,46 +138,47 @@ export default function Wishlist() {
         contentContainerStyle={{ paddingBottom: 20 }}
       >
         <View className="flex-row flex-wrap justify-between">
-          {wishlist.map((item) => (
-            <View key={item._id?.toString() || item.toString()} style={{ width: CARD_WIDTH, marginBottom: 32 }}>
-              <View className="flex-col">
-                {/* Product Image */}
-                <View className="relative aspect-[3/4] overflow-hidden rounded-lg bg-gray-100">
-                  <Image
-                    source={{ uri: item.images[0] }}
-                    style={{ width: "100%", height: 256, borderRadius: 12 }}
-                    contentFit="cover"
-                    transition={300}
-                    cachePolicy="memory-disk"
-                  />
+          {wishlist
+            ?.filter((item) => item && typeof item === "object").map((item) => (
+              <View key={item._id?.toString() || item.toString()} style={{ width: CARD_WIDTH, marginBottom: 32 }}>
+                <View className="flex-col">
+                  {/* Product Image */}
+                  <View className="relative aspect-[3/4] overflow-hidden rounded-lg bg-gray-100">
+                    <Image
+                      source={{ uri: item.images[0] }}
+                      style={{ width: "100%", height: 256, borderRadius: 12 }}
+                      contentFit="cover"
+                      transition={300}
+                      cachePolicy="memory-disk"
+                    />
 
-                  {/* Remove Button */}
-                  <TouchableOpacity
+                    {/* Remove Button */}
+                    <TouchableOpacity
 
-                    onPress={() => {
+                      onPress={() => {
 
-                      const idToDelete = (item._id ?? item).toString(); // ✅ normalize
-                      removeFromWishlist(idToDelete);
-                    }}
+                        const idToDelete = (item._id ?? item).toString(); // ✅ normalize
+                        removeFromWishlist(idToDelete);
+                      }}
 
-                    className="absolute top-2 right-2 w-8 h-8 items-center justify-center rounded-full bg-white/90"
-                  >
-                    <Ionicons name="close" size={16} color="#333" />
-                  </TouchableOpacity>
-                </View>
+                      className="absolute top-2 right-2 w-8 h-8 items-center justify-center rounded-full bg-white/90"
+                    >
+                      <Ionicons name="close" size={16} color="#333" />
+                    </TouchableOpacity>
+                  </View>
 
-                {/* Product Info */}
-                <View className="mt-2">
-                  <Text className="text-base font-medium text-gray-800" numberOfLines={1}>
-                    {item.name}
-                  </Text>
-                  <Text className="text-sm text-gray-500">
-                    ${item.price.toFixed(2)}
-                  </Text>
+                  {/* Product Info */}
+                  <View className="mt-2">
+                    <Text className="text-base font-medium text-gray-800" numberOfLines={1}>
+                      {item.name}
+                    </Text>
+                    <Text className="text-sm text-gray-500">
+                      ${item.price.toFixed(2)}
+                    </Text>
+                  </View>
                 </View>
               </View>
-            </View>
-          ))}
+            ))}
         </View>
 
         {/* Add All to Cart Button */}

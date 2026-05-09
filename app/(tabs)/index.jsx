@@ -51,9 +51,16 @@ export default function Index() {
 
 
   const isInWishlist = (id) => {
-    if (!wishlist) return false;
+    if (!Array.isArray(wishlist)) {
+      console.log("wishlist is not array");
+      return false;
+    }
+
     return wishlist.some((item) => {
-      const compareId = item._id || item;
+
+
+      const compareId = item?._id || item;
+
       return String(compareId) === String(id);
     });
   };
