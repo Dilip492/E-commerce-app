@@ -5,7 +5,7 @@ import { useRouter } from "expo-router";
 
 
 import { useFocusEffect } from "expo-router";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 import {
   Dimensions,
@@ -20,7 +20,9 @@ import {
 // useEffect
 import { SafeAreaView } from "react-native-safe-area-context";
 // import UseWishlist from "../../hooks/UseWishlist";
-
+import { LinearGradient } from "expo-linear-gradient";
+// import { SafeAreaView } from "react-native-safe-area-context";
+import ShimmerPlaceHolder from "react-native-shimmer-placeholder";
 import { useAddCart } from "../../hooks/UseCart";
 import UseWishlist from "../../hooks/UseWishlist";
 
@@ -35,6 +37,10 @@ export default function Wishlist() {
 
   const { wishlist, removeFromWishlist } = UseWishlist();
   const { mutate: addTocart, isPending } = useAddCart();
+
+  const [loading, setLoading] = useState(true);
+
+
 
   // const { wishlist, removeFromWishlist } = UseWishlist();
   const queryClient = useQueryClient();
@@ -177,12 +183,19 @@ export default function Wishlist() {
                 <View className="flex-col">
                   {/* Product Image */}
                   <View className="relative aspect-[3/4] overflow-hidden rounded-lg bg-gray-100">
+                    {loading && (
+                      <ShimmerPlaceHolder
+                        LinearGradient={LinearGradient}
+                        style={{ width: "100%", height: 150, borderRadius: 10 }}
+                      />
+                    )}
                     <Image
                       source={{ uri: item.images[0] }}
                       style={{ width: "100%", height: 256, borderRadius: 12 }}
                       contentFit="cover"
                       transition={300}
                       cachePolicy="memory-disk"
+                      onLoadEnd={()=>{setLoading(false)}}
                     />
 
                     {/* Remove Button */}
