@@ -1,11 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useQueryClient } from "@tanstack/react-query";
+import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
-import { useRouter } from "expo-router";
-
-
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
+import Toast from "react-native-toast-message";
 
 import {
   Dimensions,
@@ -105,6 +104,18 @@ export default function Wishlist() {
     // setWishlistItems(prev => prev.filter(item => item.id !== id));
     const idToDelete = (item._id ?? item).toString();
     removeFromWishlist(idToDelete);
+
+    Haptics.notificationAsync(
+      Haptics.NotificationFeedbackType.Success
+    );
+    Toast.show({
+      type: "success",
+      text1: "Item Remove to Wishlist",
+      text2: "Item Remove to Wishlist successfully",
+      position: "top",
+      visibilityTime: 2000,
+    });
+
   };
 
   const addAllToCart = async () => {
@@ -129,12 +140,34 @@ export default function Wishlist() {
             quantity: 1,
           });
 
+
         })
       );
 
-      console.log("All items added to cart");
+      // console.log("All items added to cart");
+      Haptics.notificationAsync(
+        Haptics.NotificationFeedbackType.Success
+      );
+      Toast.show({
+        type: "success",
+        text1: "Added to Cart",
+        text2: "All wishlist items added successfully",
+        position: "top",
+        visibilityTime: 2000,
+      });
 
     } catch (error) {
+
+      Haptics.notificationAsync(
+        Haptics.NotificationFeedbackType.Error
+      );
+
+      Toast.show({
+        type: "error",
+        text1: "Cart Error",
+        text2: "Failed to add items to cart",
+        position: "top",
+      });
       console.log("Add all cart error:", error);
     }
   };
@@ -195,7 +228,7 @@ export default function Wishlist() {
                       contentFit="cover"
                       transition={300}
                       cachePolicy="memory-disk"
-                      onLoadEnd={()=>{setLoading(false)}}
+                      onLoadEnd={() => { setLoading(false) }}
                     />
 
                     {/* Remove Button */}

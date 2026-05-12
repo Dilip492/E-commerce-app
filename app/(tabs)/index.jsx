@@ -148,8 +148,53 @@ export default function Index() {
       <ScrollView showsVerticalScrollIndicator={false}>
 
         {/* Header */}
-        <View className="flex-row items-center justify-between px-6 py-4">
-          <Text className="text-2xl font-semibold tracking-tight">Elysian</Text>
+        <View className="flex-row  items-center justify-between px-6 py-4">
+          <Text className="items-center"
+            style={{
+              fontSize: 24,
+              color: "#050816",
+              letterSpacing: 0.1,
+              lineHeight: 46,
+              textAlign: "center",
+
+              // Smooth premium look
+              textShadowColor: "rgba(0,0,0,0.08)",
+              textShadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              textShadowRadius: 4,
+            }}
+          >
+            Shop<Text style={{
+              fontSize: 24,
+              color: "#050816",
+              fontWeight: "bold",
+              lineHeight: 46,
+              textAlign: "center",
+
+              // Smooth premium look
+              textShadowColor: "rgba(0,0,0,0.08)",
+              textShadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              textShadowRadius: 4,
+            }} >Ease.</Text>
+          </Text>
+          {/* <Image
+            source={require("../../assets/images/original_logo_shopease.png")}
+            style={{
+              width: 150,
+              height: 50,
+              resizeMode: "contain",
+
+
+            }}
+            cachePolicy="memory-disk"
+            transition={300}
+
+          /> */}
           <View className="flex-row gap-4">
             <Ionicons name="notifications-outline" size={22} color="#333" />
             <Ionicons name="bag-outline" size={22} color="#333" />

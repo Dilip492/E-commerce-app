@@ -11,6 +11,8 @@ import { toastConfig } from "../utils/toastconfig";
 
 SplashScreen.preventAutoHideAsync();
 
+SplashScreen.preventAutoHideAsync();
+
 export default function RootLayout() {
   const segments = useSegments();
   const [token, setToken] = useState(null);
